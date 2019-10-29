@@ -1,8 +1,14 @@
-FROM ubuntu:12.04
-MAINTAINER Kimbro Staken version: 0.1
-RUN apt-get update && apt-get install -y apache2 && apt-get clean && rm -rf /var/lib/apt/lists/*
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
+FROM redhat/rhel7
+MAINTAINER suresh
+
+RUN yum -y update; yum clean all
+RUN yum -y install httpd; yum clean all
+RUN echo "Apache" >> /var/www/html/index.html
+
 EXPOSE 80
-CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+
+# Simple startup script to avoid some issues observed with container restart
+ADD run-apache.sh /run-apache.sh
+RUN chmod -v +x /run-apache.sh
+
+CMD ["/run-apache.sh"]
